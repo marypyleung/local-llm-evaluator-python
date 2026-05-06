@@ -69,9 +69,9 @@ To run a batch evaluation, prepare a CSV with the following columns:
   - Format: ["Do not mention competitor names", "Only discuss technical specs"]
 
 
-### Quick Start
+### ⏩ Quick Start
 
-#### Setup
+#### 💻 Setup
 - Option 1: Clone this repo.
 git clone
 
@@ -86,7 +86,7 @@ pip install -r requirements/requirements.txt
 Execute python script in each directory.
 
 
-#### Import required libraries
+#### 📚 Import required libraries
 import re
 from sentence_transformers import SentenceTransformer, CrossEncoder, util
 from transformers import pipeline
@@ -106,7 +106,7 @@ Basically, the 6 steps for evaluation use the following local NLP/ evaluation ap
 
 You can change the models/ remove any parts of the steps based on your needs.
 
-### Object Class Script
+### 📄 Object Class Script
 <details>
 <summary>Click to expand for Object Class Script</summary>
 
