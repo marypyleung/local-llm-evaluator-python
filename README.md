@@ -1,21 +1,21 @@
 # Local LLM Evaluator in Python 🔍
 A transparent, cost-aware evaluation harness for LLM generated responses using local NLP models (embeddings + entailment), avoiding paid LLM judge APIs.
 
-### 🚀 TL;DR 
+## 🚀 TL;DR 
 A cost-effective alternative to "LLM-as-a-judge." Use local NLP models to evaluate relevance, semantic equivalence, and logical entailment via a CSV-in → CSV-out workflow. Designed for large-scale regression testing where explainability and cost matter.
 
-### ❓ Why This Project?
+## ❓ Why This Project?
 <details>
 <summary>Click to expand: The problem with manual and LLM evaluation</summary>
   
 Traditional evaluation relies on manual review (not scalable) or LLM-as-a-judge (expensive "black box").
 
-#### In LLM training and regression testing, evaluation often starts with manual comparison of expected vs actual answers. However, in practice this approach quickly breaks down:
+### In LLM training and regression testing, evaluation often starts with manual comparison of expected vs actual answers. However, in practice this approach quickly breaks down:
 - **Subjectivity:** “Correct / incorrect” is often a matter of opinion among reviewers.
 - **Vagueness:** Evaluation dimensions are often implicit rather than defined.
 - **Scalability:** For large datasets, human review is labor-intensive and slow.
 
-#### This motivates the idea of** using AI to evaluate AI** to ask an LLM to act as a judge via a prompt. While this can be effective, it often introduces:
+### This motivates the idea of** using AI to evaluate AI** to ask an LLM to act as a judge via a prompt. While this can be effective, it often introduces:
 - **Cost concerns** when judging large datasets using paid LLM APIs
 - A **black‑box decision process** (“the LLM decided monolithically**”)
 - **Difficulty explaining** why a result failed
@@ -28,7 +28,7 @@ To code with the dilemma, this project is attempting to download free library re
 - **Transparency:** No "black box" prompts; results come from specific NLP models (RoBERTa/MPNet).
 - **Determinism:** Same input, same score. Every time.
 
-### 📊 Evaluation Mapping with Industry Standards
+## 📊 Evaluation Mapping with Industry Standards
 Here is the summary table of what industry standard consider VS the inclusion and implemetation in our project.
 
 | Dimension | Industry Standard | Covered in This Project? | Implementation Logic |
@@ -43,22 +43,20 @@ Here is the summary table of what industry standard consider VS the inclusion an
 | **Safety / Toxicity** | ✅ Yes | ❌ No | Requires specialized models (e.g., Llama Guard). |
 
 
-### 🛠️ Key Design Choices
+## 🛠️ Key Design Choices
 - **The "No-Claims" Solution:** Uses bidirectional NLI (Actual ↔ Expected) to check logical implication even if you haven't defined manually written atomic claims.
 - **Over-generation Warnings:** Flags extra entities as `WARNING` instead of a hard failure. This keeps humans in the loop for final verification.
 - **CSV-First Architecture:** Built for data pipelines. One row in, one row out. Results are stored as JSON strings in CSV columns, ready for Excel or PowerBI.
 - **Local & Deterministic:** You define your own local models (e.g., `all-mpnet-base-v2`) to produce consistent scores.
 
 
-### 🚫 Out of Scope
+## 🚫 Out of Scope
 Our goal is to provide a correctness-first tool for regression testing, not to replace human qualitative review. To preserve determinism and avoid subjective evaluation, we do not evaluate:
 - **Fluency/Style:** Better handled via system prompts or moderation guardrails.
 - **Creativity:** Subjective quality that local models cannot reliably score.
 - **Safety/Toxicity:** Requires specialized, policy-driven classifiers.
 
----
-
-### 📂 Input Requirements
+## 📂 Input Requirements
 To run a batch evaluation, prepare a CSV with the following columns:
 - question: The user prompt.
 - expected: The "Golden Answer" reference.
@@ -69,9 +67,9 @@ To run a batch evaluation, prepare a CSV with the following columns:
   - Format: ["Do not mention competitor names", "Only discuss technical specs"]
 
 
-### ⏩ Quick Start
+## ⏩ Quick Start
 
-#### 💻 Setup
+### 💻 Setup
 - Option 1: Clone this repo.
 git clone
 
@@ -86,27 +84,28 @@ pip install -r requirements/requirements.txt
 Execute python script in each directory.
 
 
-#### 📚 Import required libraries
+### 📚 Import required libraries
+```python
 import re
 from sentence_transformers import SentenceTransformer, CrossEncoder, util
 from transformers import pipeline
+```
 
-
-#### Define the Object Class, `DimensionOutcomeEvaluator` for Evaluation 
+### Define the Object Class, `DimensionOutcomeEvaluator` for Evaluation 
 Basically, the 6 steps for evaluation use the following local NLP/ evaluation approaches:
 
 | Steps | Evaluation Dimension | Explanation | Involved NLP/ Embedding Models |
 | :--- | :--- | :--- | :--- |
 | 1 |**Topic Relevance**| Ensures the LLM output directly addresses the user's question | all-mpnet-base-v2 (Cosine Similarity) |
 | 2 |**Semantic Similarity** | Compares the Expected (Ground Truth) to the Actual Response for meaning-based alignment | Cross-Encoder (High-precision pairwise scoring) |
-| 3 | **Faithfulness** | Verify if the response is logically supported by specific Atomic Claims | RoBERTa-MNLI (Micro-Judge Logic) |  
-| 4 | **Logical Equivalence** | A bidirectional check to ensure the response and golden answer share the same meaning | RoBERTa-MNLI (Inference Engine) |
-| 5 | **Scope Alignment** | Ensures the response adheres to specific Scope Rules (constraints) and ignores irrelevant "noise" | roberta-large-mnli |
+| 3 | **Faithfulness** | Verify if the response is logically supported by specific Atomic Claims | roberta-large-mnli |  
+| 4 | **Logical Equivalence** | A bidirectional check to ensure the response and golden answer share the same meaning |  roberta-large-mnli  |
+| 5 | **Scope Alignment** | Ensures the response adheres to specific Scope Rules (constraints) and ignores irrelevant "noise" | roberta-large-mnli  |
 | 6 | **Hallucination Detection** | Identifies over-generation/extra entities not present in the reference | Heuristic Text Analysis (Non-LLM preprocessing) |
 
 You can change the models/ remove any parts of the steps based on your needs.
 
-### 📄 Object Class Script
+### 📄 Object Class `DimensionOutcomeEvaluator` Script
 <details>
 <summary>Click to expand for Object Class Script</summary>
 
@@ -363,7 +362,7 @@ class DimensionOutcomeEvaluator:
 ```
 </details>
 
-### Batch Evaluation Wrapper
+### Batch Evaluation Wrapper `evaluate_lists` script
 
 <details>
 <summary>Click to expand for Object Class Script</summary>
@@ -458,6 +457,7 @@ def evaluate_lists(
 ### Usage Example
 <details>
 <summary>Click to expand for Function Call example</summary>
+  
 ```python
 evaluate_lists(question_list, expected_list, actual_list)
 ```
