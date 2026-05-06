@@ -87,15 +87,10 @@ Execute python script in each directory.
 
 
 #### Import required libraries
-<details>
-<summary>Click to expand</summary>
-  
-```
 import re
 from sentence_transformers import SentenceTransformer, CrossEncoder, util
 from transformers import pipeline
-```
-</details>
+
 
 #### Define the Object Class, `DimensionOutcomeEvaluator` for Evaluation 
 Basically, the 6 steps for evaluation use the following local NLP/ evaluation approaches:
@@ -368,13 +363,12 @@ class DimensionOutcomeEvaluator:
 ```
 </details>
 
-### Function to call the object class
+### Batch Evaluation Wrapper
 
 <details>
 <summary>Click to expand for Object Class Script</summary>
   
 ```python
-topic_relevance_q=[]
 def evaluate_lists(
     question_list,
     expected_list, 
@@ -383,6 +377,7 @@ def evaluate_lists(
     scope_claims_list = None,
     use_cross_encoder = True):
     results  = []
+    topic_relevance_q=[]
     """
         Orchestrates batch evaluation of LLM responses across all five dimensions.
 
@@ -460,7 +455,7 @@ def evaluate_lists(
 ```
 </details>
 
-### Example of Running the Function Call
+### Usage Example
 <details>
 <summary>Click to expand for Function Call example</summary>
 ```python
