@@ -91,8 +91,8 @@ from sentence_transformers import SentenceTransformer, CrossEncoder, util
 from transformers import pipeline
 ```
 
-### Define the Object Class, `DimensionOutcomeEvaluator` for Evaluation 
-Basically, the 6 steps for evaluation use the following local NLP/ evaluation approaches:
+### Evaluation Framework & Methodology
+The DimensionOutcomeEvaluator suite measures performance across six critical dimensions using local NLP models:
 
 | Steps | Evaluation Dimension | Explanation | Involved NLP/ Embedding Models |
 | :--- | :--- | :--- | :--- |
@@ -105,7 +105,7 @@ Basically, the 6 steps for evaluation use the following local NLP/ evaluation ap
 
 You can change the models/ remove any parts of the steps based on your needs.
 
-### 📄 Object Class `DimensionOutcomeEvaluator` Script
+### 📄 Object Class `DimensionOutcomeEvaluator` Script for Evaluation 
 <details>
 <summary>Click to expand for Object Class Script</summary>
 
