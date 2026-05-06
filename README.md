@@ -15,7 +15,7 @@ Traditional evaluation relies on manual review (not scalable) or LLM-as-a-judge 
 - **Vagueness:** Evaluation dimensions are often implicit rather than defined.
 - **Scalability:** For large datasets, human review is labor-intensive and slow.
 
-### This motivates the idea of** using AI to evaluate AI** to ask an LLM to act as a judge via a prompt. While this can be effective, it often introduces:
+### This motivates the idea of using AI to evaluate AI to ask an LLM to act as a judge via a prompt. While this can be effective, it often introduces:
 - **Cost concerns** when judging large datasets using paid LLM APIs
 - A **black‑box decision process** (“the LLM decided monolithically**”)
 - **Difficulty explaining** why a result failed
