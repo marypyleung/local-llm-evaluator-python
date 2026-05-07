@@ -428,6 +428,35 @@ def evaluate_lists(
   
 ```python
 # Simple execution
+questions = input("Please enter the absolute path for Excel file")
+import pandas as pd
+df = pd.read_excel(questions, header=0)
+results = evaluate_lists(questions, expected, actual)
+
+try:
+    question_list = df['Questions'].tolist()  # Converts the Series to a Python list
+    print("Question list:", question_list)
+except KeyError:
+    print("Error: Column not found in DataFrame.")
+except Exception as e:
+    print(f"Unexpected error: {e}")
+try:
+    actual_list = df['Chatbot Answers'].tolist()  # Converts the Series to a Python list
+    print("Actual list:", actual_list)
+except KeyError:
+    print("Error: Column not found in DataFrame.")
+except Exception as e:
+    print(f"Unexpected error: {e}")
+    try:
+    expected_list = df['Expected Answers'].tolist()  # Converts the Series to a Python list
+    print("Expected list:", expected_list)
+except KeyError:
+    print("Error: Column not found in DataFrame.")
+except Exception as e:
+    print(f"Unexpected error: {e}")
+
+
+# Simple execution
 results = evaluate_lists(questions, expected, actual)
 
 # Accessing a specific metric
