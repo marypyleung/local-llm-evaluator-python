@@ -461,5 +461,51 @@ results = evaluate_lists(questions, expected, actual)
 
 # Accessing a specific metric
 print(results[0]['🎯 semantic_similarity']['level'])
+
+
+entity_rows = []
+summary_rows = []
+for idx, result in enumerate(results):
+        # ---- Summary row ----
+        summary_rows.append({
+            "RowIndex": result.get("row_index", idx),
+
+            "TopicStatus": result.get("topic_relevance", {}).get("status"),
+            "TopicSimilarity": result.get("topic_relevance", {}).get("similarity"),
+
+            "SemanticLevel": result.get("semantic_similarity", {}).get("level"),
+            "SemanticSimilarity": result.get("semantic_similarity", {}).get("similarity"),
+
+            "EntailmentOverall": result.get("entailment", {}).get("overall_status"),
+            "EntailmentReason": result.get("entailment", {}).get("reason"),
+
+            "ScopeStatus": result.get("scope_alignment", {}).get("status"),
+            "ScopeReason": result.get("scope_alignment", {}).get("reason"),
+
+            "OverGenStatus": result.get("over_generation", {}).get("status"),
+
+            "ExpectedEntities": "||".join(result.get("over_generation", {}).get("expected_entities", [])),
+            "ActualEntities": "||".join(result.get("over_generation", {}).get("actual_entities", [])),
+            "ExtraEntities": "||".join(result.get("over_generation", {}).get("extra_entities", [])),
+            
+        })
+
+        # ---- Entities long table ----
+        og = result.get("over_generation", {})
+        for etype in ["expected_entities", "actual_entities", "extra_entities"]:
+            for ent in og.get(etype, []):
+                entity_rows.append({
+                    "RowIndex": result.get("row_index", idx),
+                    "EntityType": etype,
+                    "Entity": ent
+                })
+df_summary = pd.DataFrame(summary_rows)
+df_entities = pd.DataFrame(entity_rows)
+
+with pd.ExcelWriter("comparison (3).xlsx", engine="openpyxl") as writer:
+    df_summary.to_excel(writer, sheet_name="Summary", index=False)
+    df_entities.to_excel(writer, sheet_name="OverGenEntities", index=False)
+
+
 ```
 </details>
