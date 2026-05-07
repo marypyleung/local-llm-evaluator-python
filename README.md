@@ -363,11 +363,11 @@ class DimensionOutcomeEvaluator:
         }
 ```
 </details>
+
 ### Script for Data Utilities (CSV Import Loading & Export Processing)
 <details>
 <summary>Click to expand for inputted CSV processing script</summary>
-questionList = input("Please enter the absolute path for CSV file")
-  
+
 ```python
 def load_data(file_path):
   """Loads CSV and ensures columns are ready for AI processing."""
@@ -417,15 +417,14 @@ def export_data(results, filename="Evaluation_Report"):
     # Export to CSV format
     df_final.to_csv(f"{filename}.csv", index=False)
     
-    print(f"✅ Detailed report saved to {filename}.xlsx and .csv")
+    print(f"Detailed report saved to {filename}.xlsx and .csv")
 ```
 </details>
 
-### Orchestrator script that generate result using Object and Utils together 
-
+### Orchestrator script that generate result using Object and Utils together
 <details>
 <summary>Click to expand for defining a `evaluate_lists` function which load models via  `DimensionOutcomeEvaluator` object class & process data by calling `load_data` and `export_data` </summary>
-  
+
 ```python
 def evaluate_lists(question_list, expected_list, actual_list, claims_list=None, scope_claims_list=None):
     # Initialize the "Object" (Engine)
@@ -448,9 +447,9 @@ def evaluate_lists(question_list, expected_list, actual_list, claims_list=None, 
 </details>
 
 ### EXECUTION GATE
-# This block ensures the script only runs if executed directly (not when imported)
 <details>
-<summary>Click to see the final puzzle for execution script </summary>
+<summary>Click to see the final puzzle for execution script which ensures the script only runs if executed directly (not when imported) </summary>
+
 ```python
 if __name__ == "__main__":
     # Request the file path from the user (supports CSV)
@@ -459,7 +458,7 @@ if __name__ == "__main__":
     # Check if the file exists before starting the model loading
     import os
     if os.path.exists(path):
-        evaluate_all(path)
+        evaluate_lists(path)
     else:
         print(f"Error: The file '{path}' was not found. Please check the path and try again.")
 ```
