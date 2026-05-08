@@ -423,7 +423,7 @@ def export_data(results, filename="Evaluation_Report"):
 
 ### Orchestrator script that generate result using Object and Utils together
 <details>
-<summary>Click to expand for defining a `evaluate_lists` function which load models via  `DimensionOutcomeEvaluator` object class & process data by calling `load_data` and `export_data` </summary>
+<summary>Click to expand for defining a `evaluate_lists` function which load models via  `DimensionOutcomeEvaluator` object class & process data</summary>
 
 ```python
 def evaluate_lists(question_list, expected_list, actual_list, claims_list=None, scope_claims_list=None):
@@ -446,19 +446,50 @@ def evaluate_lists(question_list, expected_list, actual_list, claims_list=None, 
 ```
 </details>
 
+<details>
+ <summary>Click to see the Orchestrator which acts as the "Manager." to call the utility to load the data, passes that data to the evaluator, and then hands the results to the exporter.</summary> 
+```python
+def run_pipeline(file_path):
+    """
+    The full sequence: 
+    1. Load Data (CSV -> Dict)
+    2. Evaluate (AI Logic)
+    3. Export (Dict -> CSV)
+    """
+    # 1. LOAD: Convert file to Python lists
+    print(f"📂 Loading data from: {file_path}")
+    data = load_data(file_path)
+    
+    # 2. EVALUATE: Pass lists into the AI evaluator
+    # Note: we use .get() for optional columns like Claims or Scopes
+    print("🧠 Starting AI Evaluation... (Initializing Models)")
+    results = evaluate_lists(
+        question_list=data["questions"],
+        expected_list=data["expected"],
+        actual_list=data["actual"],
+        claims_list=data.get("claims"), 
+        scope_claims_list=data.get("scopes")
+    )
+    
+    # 3. EXPORT: Save results to a new file
+    print("💾 Exporting results to 'Evaluation_Report.csv'...")
+    export_data(results, filename="Evaluation_Report")
+    print("✅ Done!")
+```
+</details>
 ### EXECUTION GATE
 <details>
 <summary>Click to see the final puzzle for execution script which ensures the script only runs if executed directly (not when imported) </summary>
 
 ```python
 if __name__ == "__main__":
-    # Request the file path from the user (supports CSV)
+    # Request the file path
     path = input("Enter the path to your data file (e.g., data.csv): ").strip()
     
-    # Check if the file exists before starting the model loading
     import os
     if os.path.exists(path):
-        evaluate_lists(path)
+        # We call the pipeline manager, NOT the raw evaluator
+        run_pipeline(path)
     else:
         print(f"Error: The file '{path}' was not found. Please check the path and try again.")
 ```
