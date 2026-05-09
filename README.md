@@ -87,8 +87,9 @@ To run a batch evaluation, prepare a CSV with the following columns:
 
 ### 💻 Setup
 - Option 1: Clone this repo.
-git clone
-
+```bash
+git clone https://github.com/marypyleung/local-llm-evaluator-python.git
+```
 - Option 2: Install the required libraries using conda :
 ```bash
 conda env create -f requirements/environment.yml
