@@ -455,7 +455,7 @@ def run_evaluation(input="sample_test.csv", output_path="evaluation_result.csv")
             
             # Dimension 3: Entailment (Critical Claims)
             "entailment_result": res_entailment.get("entailment_result", "ERROR"),
-            "critical_claims_met": res_entailment.get("count_claims_met", "0 of 0"),
+            "entailment_met": res_entailment.get("count_claims_met", "0 of 0"),
             
             # Dimension 4: Scope Coverage 
             "coverage_result": res_coverage["coverage_result"],
