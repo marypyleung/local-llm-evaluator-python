@@ -113,8 +113,8 @@ The DimensionOutcomeEvaluator suite measures performance across six critical dim
 
 | Steps | Evaluation Dimension | Explanation | Involved NLP/ Embedding Models |
 | :--- | :--- | :--- | :--- |
-| 1 |**Topic Relevance**| Ensures the LLM output directly addresses the user's question |[ all-mpnet-base-v2 (Cosine Similarity)](https://huggingface.co/sentence-transformers/all-mpnet-base-v2) |
-| 2 |**Semantic Similarity** | Compares the Expected (Ground Truth) to the Actual Response for meaning-based alignment | [Cross-Encoder (High-precision pairwise scoring)](https://huggingface.co/cross-encoder/stsb-roberta-large) |
+| 1 |**Topic Relevance**| Ensures the LLM output directly addresses the user's question |[ all-mpnet-base-v2](https://huggingface.co/sentence-transformers/all-mpnet-base-v2) |
+| 2 |**Semantic Similarity** | Compares the Expected (Ground Truth) to the Actual Response for meaning-based alignment | [Cross-Encoder](https://huggingface.co/cross-encoder/stsb-roberta-large) |
 | 3 | **Entailment** | Verify if the response is logically supported by specific Atomic Claims | [roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
 | 4 | **Scope Coverage** | Ensures the response covers expected content (constraints) | [roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli)  |
 | 5 | **Hallucination** | Identifies over-generation/extra entities not present in the reference |[roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
@@ -146,7 +146,7 @@ class DimensionOutcomeEvaluator:
         """Initializes AI models for embedding, cross-encoding, and NLI."""
         # 1. Embedding Model (Sentence-Transformer)
         self.embedder = SentenceTransformer(embed_model)
-        # 2. Cross-Encoder (Optional - for high-precision semantic similarity)
+        # 2. Cross-Encoder (for high-precision semantic similarity)
         self.use_cross_encoder = use_cross_encoder
         self.cross_encoder = CrossEncoder(cross_encoder_model) if use_cross_encoder else None
 
@@ -167,9 +167,9 @@ class DimensionOutcomeEvaluator:
             
             This internal utility determines the logical relationship between two 
             text segments. It serves as the foundation for:
-            - Step 3: Fact-checking (Entailment Outcome)
-            - Step 4: Under-generation (Scope Coverage)
-            - Step 5: Hallucination (Grounding)
+            - Step 3: Entailment (Fact-checking)
+            - Step 4: Scope Coverage (Undergeneration)
+            - Step 5: Hallunication (Grounding)
             
              Logic Flow inherited from label field of roberta-large-mnli model:
             - ENTAILMENT: The premise supports the hypothesis.
@@ -376,10 +376,10 @@ class DimensionOutcomeEvaluator:
 ```
 </details>
 
-### Script for Data Utilities (CSV Import Loading & Export Processing)
+### 📄 Data Utilities: Function Script `load_data`
 <details>
 <summary>Click to expand for inputted CSV processing script</summary>
-
+  
 ```python
 def load_data(file_path):
     """
@@ -405,9 +405,9 @@ def load_data(file_path):
 ```
 </details>
 
-### Orchestrator script that generate result using Object and Utils together
+### ⚙️ Execution Flow
 <details>
-<summary>Click to expand for defining a `evaluate_lists` function which load models via  `DimensionOutcomeEvaluator` object class & process data</summary>
+<summary>Click to expand for defining the function to initialize models and process the data.data function</summary>
 
 ```python
 ### Orchestrator script that generate result using Object and Utils together
@@ -476,6 +476,15 @@ def run_evaluation(input="sample_test.csv", output_path="evaluation_result.csv")
     print(f"✅ index: {output_path}")
     return df_results
 
+```
+</details>
+
+### Quick Demo of Use
+<details>
+<summary>Simple calling the function with inputtedd file and exported csv name</summary>
+
+```python
+run_evaluation("sample_test.csv","evaluation_result.csv")
 ```
 </details>
 
