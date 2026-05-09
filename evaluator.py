@@ -24,6 +24,7 @@ class DimensionOutcomeEvaluator:
         """Initializes AI models for embedding, cross-encoding, and NLI."""
         # 1. Embedding Model (Sentence-Transformer)
         self.embedder = SentenceTransformer(embed_model)
+        
         # 2. Cross-Encoder (for high-precision semantic similarity)
         self.use_cross_encoder = use_cross_encoder
         self.cross_encoder = CrossEncoder(cross_encoder_model) if use_cross_encoder else None
@@ -65,14 +66,14 @@ class DimensionOutcomeEvaluator:
         out_raw = self.nli(premise, text_pair=hypothesis)
 
         # Robust Parsing: HuggingFace pipelines return nested lists [[...]] when 
-        # top_k=None is set. We unwrap this to access the dictionary.
+        # top_k=None is set. Unwrap this to access the dictionary.
         if isinstance(out_raw, list) and len(out_raw) > 0 and isinstance(out_raw[0], list):
             data = out_raw[0]
         else:
             data = out_raw
   
 
-        # Now we can safely iterate over dictionaries
+        # Now can safely iterate over dictionaries
         try:
             # Map labels to scores and identify the winning label
             scores = {res['label'].upper(): res['score'] for res in data}
@@ -178,7 +179,7 @@ class DimensionOutcomeEvaluator:
                     "count_claims_met": "INVALID JSON FORMAT"
                 }
             
-        # Ensure we have a list of claims
+        # Ensure a list of claims existed
         if not isinstance(claims, list):
             claims = [claims]
 
