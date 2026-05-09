@@ -173,7 +173,7 @@ class DimensionOutcomeEvaluator:
                 # json.loads is stricter and safer than ast.literal_eval
                 claims = json.loads(claims.replace("'", '"')) 
             except (json.JSONDecodeError, ValueError):
-                # If it's not valid JSON, we skip it to ensure data integrity
+                # If it's not valid JSON, skip it to ensure data integrity
                 return {
                     "entailment_result": "SKIPPED",
                     "count_claims_met": "INVALID JSON FORMAT"
