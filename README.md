@@ -384,7 +384,7 @@ class DimensionOutcomeEvaluator:
 # This file imports the engine and runs the CSV processing
 
 import pandas as pd
-from Evaluator import DimensionOutcomeEvaluator
+from evaluator import DimensionOutcomeEvaluator
 
 def load_data(file_path):
     """
