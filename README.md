@@ -105,7 +105,6 @@ Execute python script in each directory.
 from sentence_transformers import SentenceTransformer, CrossEncoder, util
 from transformers import pipeline
 import pandas as pd
-import numpy as np
 import json
 ```
 
