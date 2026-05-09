@@ -471,6 +471,10 @@ def run_evaluation(input="sample_test.csv", output_path="evaluation_result.csv")
     print(f"✅ index: {output_path}")
     return df_results
 
+if __name__ == "__main__":
+    # You can specify your custom file names here
+    run_evaluation()
+
 ```
 </details>
 
