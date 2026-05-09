@@ -36,7 +36,7 @@ Here is the summary table of what industry standard consider VS the inclusion an
 | **Relevance** | ✅ Yes | ✅ Yes | **Step 1:** Embedding Cosine Similarity (Question ↔ Actual) |
 | **Semantic Correctness** | ✅ Yes | ✅ Yes | **Step 2:** Cross-Encoder (Expected ↔ Actual) |
 | **Logical Correctness** | ✅ Yes | ✅ Yes | **Step 3/5:** NLI Entailment & Hallucination |
-| **Faithfulness** | ✅ Yes | ⚠️ Partial | **Step 3:** Verification against user-provided atomic claims. |
+| **Faithfulness (Entailment)** | ✅ Yes | ⚠️ Partial | **Step 3:** Verification against user-provided atomic claims. |
 | **Scope Control** | ✅ Yes | ✅ Yes | **Step 4:** NLI check ensuring expected contents are covered in actual ones. |
 | **Hallucination** | ✅ Yes | ⚠️ Partial | **Step 5:** Heuristic Entity Extractor flags "extra" info. |
 | **Fluency / Style** | ✅ Yes | ❌ No | Intentionally excluded (focus is on content correctness). |
@@ -55,6 +55,23 @@ Our goal is to provide a correctness-first tool for regression testing, not to r
 - **Fluency/Style:** Better handled via system prompts or moderation guardrails.
 - **Creativity:** Subjective quality that local models cannot reliably score.
 - **Safety/Toxicity:** Requires specialized, policy-driven classifiers.
+
+## 🔍 How the Script Works: The Evaluation Pipeline
+The evaluator processes each row through a "Waterfall" architecture. Each step provides a different lens of truth:
+
+**Workflow:**
+```mermaid
+graph LR
+    A[Input CSV] --> B(Step 1: Topic Relevance)
+    B --> C(Step 2: Semantic Similarity)
+    C --> D(Step 3: Entailment)
+    D --> E(Step 4: Scope Coverage)
+    E --> F(Step 5: Hallucination)
+    F --> G[Output CSV]
+
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style G fill:#bbf,stroke:#333,stroke-width:2px
+```
 
 ## 📂 Input Requirements
 To run a batch evaluation, prepare a CSV with the following columns:
@@ -88,6 +105,7 @@ Execute python script in each directory.
 from sentence_transformers import SentenceTransformer, CrossEncoder, util
 from transformers import pipeline
 import pandas as pd
+import numpy as np
 import json
 ```
 
@@ -99,8 +117,8 @@ The DimensionOutcomeEvaluator suite measures performance across six critical dim
 | 1 |**Topic Relevance**| Ensures the LLM output directly addresses the user's question |[ all-mpnet-base-v2 (Cosine Similarity)](https://huggingface.co/sentence-transformers/all-mpnet-base-v2) |
 | 2 |**Semantic Similarity** | Compares the Expected (Ground Truth) to the Actual Response for meaning-based alignment | [Cross-Encoder (High-precision pairwise scoring)](https://huggingface.co/cross-encoder/stsb-roberta-large) |
 | 3 | **Entailment** | Verify if the response is logically supported by specific Atomic Claims | [roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
-| 4 | **Coverage Alignment** | Ensures the response covers expected content (constraints) | [roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli)  |
-| 5 | **Hallucination Detection** | Identifies over-generation/extra entities not present in the reference |[roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
+| 4 | **Scope Coverage** | Ensures the response covers expected content (constraints) | [roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli)  |
+| 5 | **Hallucination** | Identifies over-generation/extra entities not present in the reference |[roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
 
 You can change the models/ remove any parts of the steps based on your needs.
 
@@ -322,8 +340,11 @@ class DimensionOutcomeEvaluator:
     # 4) Scope Coverage Indicator (Under-generation)
     # -------------------------
     def coverage_indicator(self, expected, actual, conf_pass=0.70):
-        """Check if Response covers facts in Golden Answer (Actual -> Expected).
-        It will return fail if the LLM answer missed something important from the Golden Answer.""" 
+        """
+        Logic: Actual -> Expected. 
+        Checks if the 'Actual' response contains the information from the 'Expected' answer.
+        FAIL: The AI missed something important from the Golden Answer (Under-generation).
+        """
         check = self._nli(str(actual or ""), str(expected or ""))
         if check["label"] == "ENTAILMENT" and check["confidence"] >= conf_pass:
             result = "PASS"
@@ -338,8 +359,11 @@ class DimensionOutcomeEvaluator:
     # 5) Grounding Indicator (Hallucination)
     # -------------------------
     def grounding_indicator(self, expected, actual, conf_pass=0.70):
-        """Check if Response is supported by Golden Answer (Expected -> Actual).
-          It will return fail if the LLM answer made something up that wasn't in the Golden Answer. """
+        """
+        Logic: Expected -> Actual.
+        Checks if the 'Actual' response is strictly supported by the 'Expected' answer.
+        FAIL: The AI made something up that wasn't in the Golden Answer (Hallucination).
+        """
         check = self._nli(str(expected or ""), str(actual or "")) 
 
         if check["label"] == "ENTAILMENT" and check["confidence"] >= conf_pass:
