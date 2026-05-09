@@ -122,7 +122,7 @@ The DimensionOutcomeEvaluator suite measures performance across six critical dim
 
 You can change the models/ remove any parts of the steps based on your needs.
 
-### 📄 Object Class `DimensionOutcomeEvaluator` Script for Evaluation 
+### 🏗️ The Evaluation Engine: `DimensionOutcomeEvaluator`
 <details>
 <summary>Click to expand for Object Class Script</summary>
 
@@ -377,7 +377,7 @@ class DimensionOutcomeEvaluator:
 ```
 </details>
 
-### 📄 Data Utilities: Function Script `load_data`
+### 📥 Data Utilities: `load_data`
 <details>
 <summary>Click to expand for inputted CSV processing script</summary>
   
@@ -406,7 +406,7 @@ def load_data(file_path):
 ```
 </details>
 
-### ⚙️ Execution Flow
+### ⚙️ Execution Orchestrator: `run_evaluation`
 <details>
 <summary>Click to expand for defining the function to initialize models and process the data.data function</summary>
 
@@ -480,12 +480,9 @@ def run_evaluation(input="sample_test.csv", output_path="evaluation_result.csv")
 ```
 </details>
 
-### Quick Demo of Use
-<details>
-<summary>Simple calling the function with inputtedd file and exported csv name</summary>
-
+### 🎬 Quick Demo of Use
+In this example, the questions and answers are retrieved based on the United Nations ESCAP 2026 Theme Study: [Leaving no one behind: advancing a society for all ages in Asia and the Pacific](https://www.unescap.org/kp/2026/leaving-no-one-behind-advancing-society-all-ages-asia-and-pacific)
 ```python
-run_evaluation("sample_test.csv","evaluation_result.csv")
+# To run the evaluation on your local CSV files:
+run_evaluation("sample_test.csv", "evaluation_result.csv")
 ```
-</details>
-
