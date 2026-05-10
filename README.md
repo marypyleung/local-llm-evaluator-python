@@ -480,7 +480,7 @@ if __name__ == "__main__":
 </details>
 
 ## 🎬 Quick Demo of Use
-This demo evaluates AI responses against findings from the United Nations ESCAP 2026 Theme Study: [Leaving no one behind: advancing a society for all ages in Asia and the Pacific](https://www.unescap.org/kp/2026/leaving-no-one-behind-advancing-society-all-ages-asia-and-pacific)
+A demo evaluates AI responses against findings from the United Nations ESCAP 2026 Theme Study: [Leaving no one behind: advancing a society for all ages in Asia and the Pacific](https://www.unescap.org/kp/2026/leaving-no-one-behind-advancing-society-all-ages-asia-and-pacific)
 ### To run the sample demo:
 - 1: Ensure `sample_test.csv` is in the directory.
 - 2: Execute: `python run_app.py`
