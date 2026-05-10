@@ -79,6 +79,18 @@ graph LR
     style G fill:#bbf,stroke:#333,stroke-width:2px
 ```
 
+## Evaluation Framework & Methodology
+The `DimensionOutcomeEvaluator` suite measures performance across five critical dimensions using local NLP models:
+
+| Steps | Evaluation Dimension | Explanation | Involved NLP/ Embedding Models |
+| :--- | :--- | :--- | :--- |
+| 1 |**Topic Relevance**| Ensures the LLM output directly addresses the user's question |[ all-mpnet-base-v2](https://huggingface.co/sentence-transformers/all-mpnet-base-v2) |
+| 2 |**Semantic Similarity** | Compares the Expected (Ground Truth) to the Actual Response for meaning-based alignment | [Cross-Encoder](https://huggingface.co/cross-encoder/stsb-roberta-large) |
+| 3 | **Entailment** | Verify if the response is logically supported by specific Atomic Claims | [roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
+| 4 | **Scope Coverage** | Ensures the response covers expected content (constraints) | [roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli)  |
+| 5 | **Hallucination** | Identifies over-generation/extra entities not present in the reference |[roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
+
+You can change the models/ remove any parts of the steps based on your needs.
 
 ## ⏩ Quick Start
 
@@ -102,20 +114,8 @@ graph LR
   python run_app.py
   ```
 
-## Evaluation Framework & Methodology
-The DimensionOutcomeEvaluator suite measures performance across six critical dimensions using local NLP models:
 
-| Steps | Evaluation Dimension | Explanation | Involved NLP/ Embedding Models |
-| :--- | :--- | :--- | :--- |
-| 1 |**Topic Relevance**| Ensures the LLM output directly addresses the user's question |[ all-mpnet-base-v2](https://huggingface.co/sentence-transformers/all-mpnet-base-v2) |
-| 2 |**Semantic Similarity** | Compares the Expected (Ground Truth) to the Actual Response for meaning-based alignment | [Cross-Encoder](https://huggingface.co/cross-encoder/stsb-roberta-large) |
-| 3 | **Entailment** | Verify if the response is logically supported by specific Atomic Claims | [roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
-| 4 | **Scope Coverage** | Ensures the response covers expected content (constraints) | [roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli)  |
-| 5 | **Hallucination** | Identifies over-generation/extra entities not present in the reference |[roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
-
-You can change the models/ remove any parts of the steps based on your needs.
-
-## 🏗️ The Evaluation Engine: `evaluator.py`
+### 🏗️ The Evaluation Engine: `evaluator.py`
 <details>
 <summary>Click to expand for the core evaluation class and AI model logic</summary>
   
@@ -377,7 +377,7 @@ class DimensionOutcomeEvaluator:
 ```
 </details>
 
-## ⚙️ Data Utilities & Execution Orchestrator: `run_app.py`
+### ⚙️ Data Utilities & Execution Orchestrator: `run_app.py`
 <details>
 <summary>Click to expand for model execution </summary>
 
