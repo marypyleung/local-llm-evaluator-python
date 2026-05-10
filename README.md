@@ -8,19 +8,19 @@ A cost-effective alternative to "LLM-as-a-judge." Use local NLP models to evalua
 <details>
 <summary>Click to expand: The problem with manual and LLM evaluation</summary>
   
-Traditional evaluation relies on manual review (not scalable) or LLM-as-a-judge (expensive "black box").
+### Traditional evaluation relies on manual review (not scalable) or LLM-as-a-judge (expensive "black box").
 
-### In LLM training and regression testing, evaluation often starts with manual comparison of expected vs actual answers. However, in practice this approach quickly breaks down:
+#### In LLM training and regression testing, evaluation often starts with manual comparison of expected vs actual answers. However, in practice this approach quickly breaks down:
 - **Subjectivity:** “Correct / incorrect” is often a matter of opinion among reviewers.
 - **Vagueness:** Evaluation dimensions are often implicit rather than defined.
 - **Scalability:** For large datasets, human review is labor-intensive and slow.
 
-### This motivates the idea of using AI to evaluate AI to ask an LLM to act as a judge via a prompt. While this can be effective, it often introduces:
+#### This motivates the idea of using AI to evaluate AI to ask an LLM to act as a judge via a prompt. While this can be effective, it often introduces:
 - **Cost concerns** when judging large datasets using paid LLM APIs
 - A **black‑box decision process** (“the LLM decided monolithically**”)
 - **Difficulty explaining** why a result failed
 
-To code with the dilemma, this project is attempting to download free library resources and apply them for evaluating LLM output performance with reference and alignment with industry standard to provide the interested parties an other choice for affordable comparison automation.
+To cope with the dilemma, this project is attempting to download free library resources and apply them for evaluating LLM output performance with reference and alignment with industry standard to provide the interested parties an other choice for affordable comparison automation.
 </details>
 
 **This project offers:**
@@ -102,7 +102,7 @@ graph LR
   python run_app.py
   ```
 
-### Evaluation Framework & Methodology
+## Evaluation Framework & Methodology
 The DimensionOutcomeEvaluator suite measures performance across six critical dimensions using local NLP models:
 
 | Steps | Evaluation Dimension | Explanation | Involved NLP/ Embedding Models |
@@ -115,7 +115,7 @@ The DimensionOutcomeEvaluator suite measures performance across six critical dim
 
 You can change the models/ remove any parts of the steps based on your needs.
 
-### 🏗️ The Evaluation Engine: `evaluator.py`
+## 🏗️ The Evaluation Engine: `evaluator.py`
 <details>
 <summary>Click to expand for the core evaluation class and AI model logic</summary>
   
@@ -377,7 +377,7 @@ class DimensionOutcomeEvaluator:
 ```
 </details>
 
-### ⚙️ Data Utilities & Execution Orchestrator: `run_app.py`
+## ⚙️ Data Utilities & Execution Orchestrator: `run_app.py`
 <details>
 <summary>Click to expand for model execution </summary>
 
@@ -479,9 +479,9 @@ if __name__ == "__main__":
 ```
 </details>
 
-### 🎬 Quick Demo of Use
+## 🎬 Quick Demo of Use
 This demo evaluates AI responses against findings from the United Nations ESCAP 2026 Theme Study: [Leaving no one behind: advancing a society for all ages in Asia and the Pacific](https://www.unescap.org/kp/2026/leaving-no-one-behind-advancing-society-all-ages-asia-and-pacific)
-# To run the sample demo:
+### To run the sample demo:
 - 1: Ensure `sample_test.csv` is in the directory.
 - 2: Execute: `python run_app.py`
 - 3: View results in `evaluation_result.csv`.
