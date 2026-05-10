@@ -88,7 +88,7 @@ graph LR
   git clone https://github.com/marypyleung/local-llm-evaluator-python.git
   cd local-llm-evaluator-python
   ```
-- 2: Install the required dependencies (via `Conda` or `Pip`)
+- 2: Install the required dependencies (via `Conda` or `pip`)
   - Via `Conda`:
     ```bash
     conda env create -f environment.yml && conda activate llm-eval
