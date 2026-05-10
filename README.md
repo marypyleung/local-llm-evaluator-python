@@ -79,7 +79,7 @@ graph LR
     style G fill:#bbf,stroke:#333,stroke-width:2px
 ```
 
-## Evaluation Framework & Methodology
+## 🧠 Evaluation Framework & Methodology
 The `DimensionOutcomeEvaluator` suite measures performance across five critical dimensions using local NLP models:
 
 | Steps | Evaluation Dimension | Explanation | Involved NLP/ Embedding Models |
