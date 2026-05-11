@@ -1,34 +1,56 @@
 # Local LLM Evaluator in Python 🔍
-A transparent, cost-aware evaluation harness for LLM-generated responses—including RAG outputs and fine‑tuned model outputs. This project focuses on ground-truth alignment (end-to-end evaluation) using local Hugging Face models, enabling privacy-preserving evaluation at scale with zero API cost.
+A transparent, cost-aware evaluation harness for end-to-end (E2E) output alignment of chatbot responses - especially LLM-generated responses from RAG systems or fine-tuned LLMs.
+Hugging Face models, enabling privacy-preserving evaluation at scale with zero API cost.
 
-It is designed for regression testing and large-batch benchmarking where explainability, repeatability, and cost matter more than subjective “judge” prompts.
+This project evaluates whether the actual response aligns with your **expected (golden) answer** using local Hugghig Face models (embeddings, cross-encoders, and NLI). It is designed for regression testing, batch benchmarking and privacy-sensitive environment with zero API cost.
 
 ## 🚀 TL;DR 
-A cost-effective alternative to "LLM-as-a-judge." Use local NLP models to evaluate relevance, semantic equivalence, and logical entailment via a CSV-in → CSV-out workflow. Designed for large-scale regression testing where explainability and cost matter.
+- Goal: End-to-end evaluation of Actual VS Expected responses (golden dataset alignmnet)
+- Approach: Deterministic metrics using local NLP models (no "LLM-as-a-judge" prompts)
+- Workflow: CSV-in -> CSV-out, scalable for thousands of rows
+- Best for: Regression testing & continuous improvement of chatbot answer quality
+- Key dimensions: Relevance, Semantic Equivalence, Entailment/ Claims. Coverage, Over-generation (unsupported additions)
 
+## 📖 What "End-to-End Evaluation" Means Here? 
+This evaluator measures quality from the user's question to the final answer output, without requiring access to your internal bakend logic. 
+
+For each test case (row), we compare:
+- Question
+- Expected Answer (golden answer/ reference)
+- Actual Answer (chatbot output)
+
+Optional field can strengthen evaluation"
+- Claims )atomic facts that must be satisfied)
+- 
 ## ❓ Why This Project?
-<details>
-<summary>Click to expand: The problem with manual and LLM evaluation</summary>
-  
-### Traditional evaluation relies on manual review (not scalable) or LLM-as-a-judge (expensive "black box").
+Evaluation of LLM oftern becomes either:
 
-#### In LLM training and regression testing, evaluation often starts with manual comparison of expected vs actual answers. However, in practice this approach quickly breaks down:
+#### 1. Manual review
 - **Subjectivity:** “Correct / incorrect” is often a matter of opinion among reviewers.
 - **Vagueness:** Evaluation dimensions are often implicit rather than defined.
-- **Scalability:** For large datasets, human review is labor-intensive and slow.
+- **Scalability:** Human review is labor-intensive and slow, making scaling difficult.
 
-#### This motivates the idea of using AI to evaluate AI to ask an LLM to act as a judge via a prompt. While this can be effective, it often introduces:
-- **Cost concerns** when judging large datasets using paid LLM APIs
-- A **black‑box decision process** (“the LLM decided monolithically**”)
+#### 2. LLM-as-a-judge
+- **Cost concerns**: expensive at scale for paid LLM APIs
+- A **black‑box decision process** (“the LLM decided monolithically”)
 - **Difficulty explaining** why a result failed
 
-To cope with the dilemma, this project is attempting to apply free library resources for evaluating LLM output performance with reference and alignment with industry standard to provide the interested parties an other choice for affordable comparison automation.
-</details> 
+**This project provides a third option:**
+✅ Local, deterministic metrics that are explainable and cost-effective - suitble for large-scale regression testing.
+free library resources for evaluating LLM output performance with reference and alignment with industry standard to provide the interested parties an other choice for affordable comparison automation.
 
-**This project offers:**
-- **Zero Cost:** Runs locally on CPU/GPU—no OpenAI/Anthropic bills.
-- **Transparency:** No "black box" prompts; results come from specific NLP models (RoBERTa/MPNet).
-- **Determinism:** Same input, same score. Every time.
+## 🎯 When This Tools Fits (and When It Doesn't)
+✅ Great fit
+- You have a golden dataset (Expected answers)
+- You want repeatable E2E regression testing
+- You want evaluation to run locally (privacy/ cost constraint)
+- You care more about content alignment than writing style 
+
+## 🚫 Not the goal (out of scope by design)
+Our goal is to provide a correctness-first tool for regression testing, not to replace human qualitative review. We do not evaluate:
+- **Fluency/Style:** Better handled via system prompts or moderation guardrails.
+- **Creativity:** Subjective quality that local models cannot reliably score.
+- **Safety/Toxicity:** Requires specialized classifiers.
 
 ## 📊 Evaluation Mapping with Industry Standards
 Here is the summary table of what industry standard consider VS the inclusion and implemetation in our project.
@@ -36,39 +58,33 @@ Here is the summary table of what industry standard consider VS the inclusion an
 | Dimension | Industry Standard | Covered in This Project? | Implementation Logic |
 | :--- | :--- | :--- | :--- |
 | **Relevance** | ✅ Yes | ✅ Yes | **Step 1:** Embedding Cosine Similarity (Question ↔ Actual) |
-| **Semantic Correctness** | ✅ Yes | ✅ Yes | **Step 2:** Cross-Encoder (Expected ↔ Actual) |
+| **Semantic Equivalence** | ✅ Yes | ✅ Yes | **Step 2:** Cross-Encoder (Expected ↔ Actual) |
 | **Logical Correctness** | ✅ Yes | ✅ Yes | **Step 3/5:** NLI Entailment & Hallucination |
-| **Faithfulness (Entailment)** | ✅ Yes | ⚠️ Partial | **Step 3:** Verification against user-provided atomic claims. |
+| **Entailment** | ✅ Yes | ✅ Yes | **Step 3:** Verification against user-provided atomic claims. |
 | **Scope Control** | ✅ Yes | ✅ Yes | **Step 4:** NLI check ensuring expected contents are covered in actual ones. |
-| **Hallucination** | ✅ Yes | ⚠️ Partial | **Step 5:** Heuristic Entity Extractor flags "extra" info. |
+| **Unsupported Additions (Over-generation)** | ✅ Yes | ⚠️ Partial | **Step 5:** Flags "extra"/ "uncontrolled" info. |
 | **Fluency / Style** | ✅ Yes | ❌ No | Intentionally excluded (focus is on content correctness). |
 | **Safety / Toxicity** | ✅ Yes | ❌ No | Requires specialized models (e.g., Llama Guard). |
-
+Note:  Unsupported addition is often colloquially called "hallucination" but in this repo it is measured relative to the Expected answer, not against external evidence.
 
 ## 🛠️ Key Design Choices
-- **Two modes of entailment checking**
--   Claims-based (if you provide atomic claims) + Claims fallback using bidirectional NLI between Expected and Actual; or
--   No claims fallback using bidirectional NLI between Expected and Actual
-- **CSV-First Architecture:** Built for data pipelines. One row in, one row out. Results are stored in CSV columns, ready for Excel or PowerBI.
-- **Local & Deterministic:** You define your own local models (e.g., `all-mpnet-base-v2`) to produce consistent scores.
+- No "LLM judge" prompts: avoids black-box prompt decisions
+- Deterministic pipeline logic: stable results for regression comparisons
+- Local models: no API calls, supports private datasets
+- CSV-first architecture" easy integration with Excel/ Power BI/ CI pipelines
+- Claims optional: you can run with or without manually authored atomic claims.
 
-
-## 🚫 Out of Scope
-Our goal is to provide a correctness-first tool for regression testing, not to replace human qualitative review. To preserve determinism and avoid subjective evaluation, we do not evaluate:
-- **Fluency/Style:** Better handled via system prompts or moderation guardrails.
-- **Creativity:** Subjective quality that local models cannot reliably score.
-- **Safety/Toxicity:** Requires specialized, policy-driven classifiers.
 
 ## 📂 Project Structure
-- **`evaluator.py`**: The "Engine" containing the core `DimensionOutcomeEvaluator` class.
-- **`run_app.py`**: The "Orchestrator" that manages the workflow. It uses the `load_data` function for CSV ingestion and the `run_evaluation` function to execute the full AI pipeline.
-- **`requirements.txt`**: Clean list of dependencies for `Pip`.
-- **`environment.yml`**: Full environment configuration for `Conda`.
-- **sample_test.csv**: Example input dataset
-- **evaluation_result.csv**: Example output (generated)
+- **`evaluator.py`**: Core evaluation engine `DimensionOutcomeEvaluator` class
+- **`run_app.py`**: Orchestrator (CSV ingestion -> evaluation pipeline by -> CSV output) that manages the workflow. It uses the `load_data` function for CSV ingestion and the  function to execute the full AI pipeline.
+- **`requirements.txt`**: `pip` dependencies
+- **`environment.yml`**: `Conda` environment configuration
+- **sample_test.csv**: sample input dataset
+- **evaluation_result.csv**:generated sample output (after running)
 
-## 🔍 How It Works: The Evaluation Pipeline
-The evaluator processes each row through a "Waterfall" architecture. Each step provides a different lens of truth:
+## 🔍 How It Works: Waterfall Evaluation Pipeline
+Each CSV row flows through a step-by-step evaluation pipeline:
 
 **Workflow:**
 ```mermaid
@@ -84,29 +100,28 @@ graph LR
     style G fill:#bbf,stroke:#333,stroke-width:2px
 ```
 
-## 🧠 Evaluation Framework & Methodology
+## 🧠 Evaluation Methodology & Models Applied
 The `DimensionOutcomeEvaluator` suite measures performance across five critical dimensions using local NLP models:
 
 | Steps | Evaluation Dimension | Explanation | Involved NLP/ Embedding Models |
 | :--- | :--- | :--- | :--- |
-| 1 |**Topic Relevance**| Ensures the LLM output directly addresses the user's question |[ all-mpnet-base-v2](https://huggingface.co/sentence-transformers/all-mpnet-base-v2) |
-| 2 |**Semantic Similarity** | Compares the Expected (Ground Truth) to the Actual Response for meaning-based alignment | [Cross-Encoder](https://huggingface.co/cross-encoder/stsb-roberta-large) |
-| 3 | **Entailment** | Verify if the response is logically supported by specific Atomic Claims (If you don’t provide claims, Step 3 can be skipped, and Steps 4–5 still provide strong end-to-end signals.) | [roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
-| 4 | **Scope Coverage** | Ensures the response covers expected content (constraints) | [roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli)  |
-| 5 | **Overgeneration** | Identifies over-generation/extra entities not present in the reference |[roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
+| 1 |**Topic Relevance** (Question <-> Actual)| Ensures the LLM output directly addresses the user's question |[ all-mpnet-base-v2](https://huggingface.co/sentence-transformers/all-mpnet-base-v2) |
+| 2 |**Semantic Equivalence**  (Expected <-> Actual)|| CMeasure meaning-level alignment with the golden answer | [Cross-Encoder](https://huggingface.co/cross-encoder/stsb-roberta-large) 
+| 3 | **Entailment** (Actual -> Claims) _(optional but recommended)_ | Verify if the required atomic facts are supported by actual answers| [roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
+| 4 | **Scope Coverage/ Undergeneration**  (Actual -> Expected)| Check if the actual answers missed expected content (constraints) | [roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli)  |
+| 5 | **Unsupported Additions/ Overgeneration** (Expected -> Actual) | Flag content that goes beyond the expected answer |[roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
 
 You can change the models/ remove any parts of the steps based on your needs.
 
 ## ⏩ Quick Start
 
-### What is needed?
-
-Best suited for LLM outputs (RAG or fine-tuned) where you have:
-
-a question
-an expected (golden) answer
-an actual answer
-optionally, atomic claims and/or retrieved contexts
+### What input is needed?
+Based on the above methodology, a CSV input is required with the naming convention for the column names as below:
+- Questions
+- Expected Answers
+- Actual Answers
+Optional:
+- Atomic Claims (JSON-array or delimiter-separated)
 
 ### 💻 Setup
 - 1: Clone this repo.
@@ -117,11 +132,12 @@ optionally, atomic claims and/or retrieved contexts
 - 2: Install the required dependencies (via `Conda` or `pip`)
   - Via `Conda`:
     ```bash
-    conda env create -f environment.yml && conda activate llm-eval
+    conda env create -f environment.yml
+    conda activate llm-eval
     ```
   - Via `pip`:
     ```bash
-    pip install -r requirements/requirements.txt
+    pip install -r requirements.txt
     ```
 - 3: Run Evaluation
   ```bash
@@ -144,7 +160,7 @@ class DimensionOutcomeEvaluator:
     """
     A comprehensive evaluation suite for LLM responses using local models.
     Measures performance across five dimensions: Relevance, Similarity, 
-    Entailment (NLI), Scope Alignment (Coverage), and Hallucination (Grounding).
+    Entailment (NLI), Scope Coverage (undergeneration), and Unsupported Additions (overgeneration).
     """
 
 
@@ -161,7 +177,7 @@ class DimensionOutcomeEvaluator:
         # 1. Embedding Model (Sentence-Transformer)
         self.embedder = SentenceTransformer(embed_model)
 
-        # 2. Cross-Encoder (for high-precision semantic similarity)
+        # 2. Cross-Encoder (for high-precision semantic equivalence)
         self.use_cross_encoder = use_cross_encoder
         self.cross_encoder = CrossEncoder(cross_encoder_model) if use_cross_encoder else None
 
@@ -203,10 +219,12 @@ class DimensionOutcomeEvaluator:
 
         # Robust Parsing: HuggingFace pipelines return nested lists [[...]] when 
         # top_k=None is set. Unwrap this to access the dictionary.
-        if isinstance(out_raw, list) and len(out_raw) > 0 and isinstance(out_raw[0], list):
+        if isinstance(out_raw, list):
+            data = [out_raw]
+        elif isinstance(out_raw, list) and out_raw and  isinstance(out_raw[0], list):
             data = out_raw[0]
         else:
-            data = out_raw
+            data = out_raw if isinstance(out_raw, list) else []
   
 
         # Now can safely iterate over dictionaries
@@ -252,7 +270,7 @@ class DimensionOutcomeEvaluator:
         return {"relevance_result": result, "relevance_score": round(sim, 3)}
 
     # -------------------------
-    # 2) Semantic Similarity (Expected vs. Actual Response)
+    # 2) Semantic Equivalence (Expected vs. Actual Response)
     # -------------------------
     def semantic_similarity(self, expected, actual):
         """
@@ -351,13 +369,13 @@ class DimensionOutcomeEvaluator:
         }
     
     # -------------------------
-    # 4) Scope Coverage Indicator (Under-generation)
+    # 4) Scope Coverage Indicator (Undergeneration)
     # -------------------------
     def coverage_indicator(self, expected, actual, conf_pass=0.70):
         """
         Logic: Actual -> Expected. 
         Checks if the 'Actual' response contains the information from the 'Expected' answer.
-        FAIL: The AI missed something important from the Golden Answer (Under-generation).
+        FAIL: The AI missed something important from the Golden Answer (Undergeneration).
         """
         check = self._nli(str(actual or ""), str(expected or ""))
         if check["label"] == "ENTAILMENT" and check["confidence"] >= conf_pass:
@@ -370,13 +388,13 @@ class DimensionOutcomeEvaluator:
         return {"coverage_result": result}
 
     # -------------------------
-    # 5) Grounding Indicator (Hallucination)
+    # 5) Unsupported Additions (Overgeneration)
     # -------------------------
     def grounding_indicator(self, expected, actual, conf_pass=0.70):
         """
         Logic: Expected -> Actual.
         Checks if the 'Actual' response is strictly supported by the 'Expected' answer.
-        FAIL: The AI made something up that wasn't in the Golden Answer (Hallucination).
+        FAIL: The AI made something up that wasn't in the Golden Answer (unsupported additions).
         """
         check = self._nli(str(expected or ""), str(actual or "")) 
 
@@ -409,6 +427,10 @@ def load_data(file_path):
     df = pd.read_csv(file_path)
     df = df.fillna("")  # Critical: Prevents 'NoneType' errors in model encoding
 
+    # Validation: Ensure core columns exist
+    if not data_bundle["actual"]:
+        raise ValueError("The CSV must at least contain an 'Actual Answers' column.")
+
     # Map your CSV column names to the internal keys here
     return {
         "questions": df['Questions'].tolist() if 'Questions' in df.columns else [],
@@ -417,10 +439,6 @@ def load_data(file_path):
         "claims": df['Claims'].tolist() if 'Claims' in df.columns else []
     }
     
-    # Validation: Ensure core columns exist
-    if not data_bundle["actual"]:
-        raise ValueError("The CSV must at least contain an 'Actual Answers' column.")
-
 
 def run_evaluation(input="sample_test.csv", output_path="evaluation_result.csv"):
     """
