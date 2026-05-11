@@ -89,7 +89,7 @@ _Note:  Unsupported addition is often colloquially called "hallucination". In th
 ## 🔍 How It Works: Waterfall Evaluation Pipeline
 Each CSV row flows through a step-by-step evaluation pipeline:
 
-**Workflow:**
+### ** ❯❯❯❯ Workflow:**
 ```mermaid
 graph LR
     A[Input CSV] --> B(Step 1: Topic Relevance)
@@ -118,7 +118,7 @@ You can change the models/ remove any parts of the steps based on your needs.
 
 ## ⏩ Quick Start
 
-### Required CSV columns for Input
+### 📄 Required CSV columns for Input
 - Questions
 - Expected Answers
 - Actual Answers
