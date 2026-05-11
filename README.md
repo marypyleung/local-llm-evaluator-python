@@ -117,7 +117,7 @@ You can change the models/ remove any parts of the steps based on your needs.
 
 ## ⏩ Quick Start
 
-### Required CSV columns
+### Required CSV columns for Input
 - Questions
 - Expected Answers
 - Actual Answers
@@ -220,7 +220,7 @@ class DimensionOutcomeEvaluator:
         out_raw = self.nli(premise, text_pair=hypothesis)
 
         # Robust Parsing: HuggingFace pipelines may return different list formats, 
-        # top_k valu differs. Unwrap this to access the dictionary.
+        # top_k value differs. Unwrap this to access the dictionary.
         if isinstance(out_raw, list):
             data = [out_raw]
         elif isinstance(out_raw, list) and out_raw and isinstance(out_raw[0], list):
@@ -317,55 +317,49 @@ class DimensionOutcomeEvaluator:
         - BORDERLINE: If some claims are neutral/missing (Partial knowledge).
         """
 
-        # Handle the empty string/null cases from your CSV
-        if not claims or (isinstance(claims, str) and not claims.strip()):
-            return {
-                "entailment_result": "SKIPPED",
-                "count_claims_met": "0 of 0"
-            }
-        
         # Strict JSON Parsing
         if isinstance(claims, str):
+            claims = claims.strip()
+            if not claims or claims in ["[]", "None"]:
+                return {"entailment_result": "SKIPPED", "count_claims_met": "0 of 0"}
             try:
-                # json.loads is stricter and safer than ast.literal_eval
-                claims = json.loads(claims) 
+                # try standard JSON parsing first
+                claims_list = json.loads(claims)
             except (json.JSONDecodeError, ValueError):
-                # If it's not valid JSON, skip it to ensure data integrity
-                return {
-                    "entailment_result": "SKIPPED",
-                    "count_claims_met": "INVALID JSON FORMAT"
-                }
-            
-        # Ensure a list of claims existed
-        if not isinstance(claims, list):
-            claims = [claims]
+                # Fallback: Handle non-standard formats or strings with apostrophes
+                items = re.findall(r'[^\[\],]+', claims)
+                claims_list = [i.strip().strip("'\"") for i in items if i.strip()]
+                    
+                if not claims_list:
+                    return {"entailment_result": "SKIPPED", "count_claims_met": "INVALID JSON FORMAT"}
+        else:
+            claims_list = claims if isinstance(claims, list) else [claims]
 
-        total_count, entailed_count, contra_count = 0, 0, 0
+        # Filter out empty or invalid items
+        claims_list = [str(c).strip() for c in claims_list if str(c).strip()]
+        total_count = len(claims_list)
+        if total_count == 0:
+            return {"entailment_result": "SKIPPED", "count_claims_met": "0 of 0"}
+
+        entailed_count, contra_count = 0, 0
 
         # Evaluation Loop
-        for claim_text in claims:
-            claim_text = str(claim_text).strip()
-            if not claim_text:
-                continue
-
-            total_count += 1
+        for claim_text in claims_list:
             r = self._nli(actual, claim_text)
-            
             if r["label"] == "ENTAILMENT":
                 entailed_count += 1
             elif r["label"] == "CONTRADICTION":
                 contra_count += 1
 
-        # Verdict Logic
-        if total_count == 0:
-            result, count = "SKIPPED", "0 of 0"
-        elif contra_count > 0:
-            result, count = "FAIL", f"{entailed_count} of {total_count}"
-        elif entailed_count == total_count:
-            result, count = "PASS", f"{entailed_count} of {total_count}"
-        else:
-            result, count = "BORDERLINE", f"{entailed_count} of {total_count}"
+        # Verdict Logic: only pass or fail, any missing atomic claims in actual answer --> fail
+        count = f"{entailed_count} of {total_count}"
 
+        if entailed_count == total_count:
+  
+            result = "PASS"
+        else :
+            result = "FAIL"
+       
         return {
             "entailment_result": result,
             "count_claims_met": count
