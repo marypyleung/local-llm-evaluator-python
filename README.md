@@ -122,7 +122,7 @@ You can change the models/ remove any parts of the steps based on your needs.
 - Expected Answers
 - Actual Answers
 Optional:
-- Atomic Claims (JSON-array or delimiter-separated)
+- Atomic Claims (JSON-array such as ["abc", "xyz"])
 
 ### 💻 Setup
 - 1: Clone this repo.
