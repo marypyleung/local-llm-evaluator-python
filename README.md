@@ -46,7 +46,7 @@ Here is the summary table of what industry standard consider VS the inclusion an
 ## 🛠️ Key Design Choices
 - **The "No-Claims" Solution:** Uses bidirectional NLI (Actual ↔ Expected) to check logical implication even if you haven't defined manually written atomic claims.
 - **Over-generation Warnings:** Flags extra entities as `WARNING` instead of a hard failure. This keeps humans in the loop for final verification.
-- **CSV-First Architecture:** Built for data pipelines. One row in, one row out. Results are stored as JSON strings in CSV columns, ready for Excel or PowerBI.
+- **CSV-First Architecture:** Built for data pipelines. One row in, one row out. Results are stored in CSV columns, ready for Excel or PowerBI.
 - **Local & Deterministic:** You define your own local models (e.g., `all-mpnet-base-v2`) to produce consistent scores.
 
 
