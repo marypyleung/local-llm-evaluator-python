@@ -25,24 +25,24 @@ Optional field:
 ## ❓ Why This Project?
 Evaluation of LLM oftern becomes either:
 
-#### 1️⃣ Manual review
+### 1️⃣ Manual review
 - **Subjectivity:** “Correct / incorrect” is often a matter of opinion among reviewers
 - **Vagueness:** Evaluation dimensions are often implicit rather than defined
 - **Scalability:** Human review is labor-intensive and slow
 
-#### 2️⃣ LLM-as-a-judge
+### 2️⃣ LLM-as-a-judge
 - **Cost concerns**: expensive at scale for paid LLM APIs
 - **Black‑box decision process** (“the prompts decided monolithically”)
 - **Difficulty explaining** why a result failed
 
-#### ✅**This project provides a third option**
+### ✅**This project provides a third option**
 - Local
 - Deterministic outcome with explainability 
 - Cost-efficient 
 Designed for regression testing using industry-aligned evaluation concepts to provide interested parties an other choice for affordable comparison automation.
 
 ## 🎯 When This Tools Fits (and When It Doesn't)
-✅ Great fit
+### ✅ Great fit when
 - You have a **golden dataset** (Expected answers)
 - You want **repeatable E2E regression testing**
 - You want **local execution for LLM evaluation** (privacy/ cost constraint)
