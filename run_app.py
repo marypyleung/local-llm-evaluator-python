@@ -11,6 +11,7 @@ def load_data(file_path):
     df = pd.read_csv(file_path)
     df = df.fillna("")  # Critical: Prevents 'NoneType' errors in model encoding
 
+
     # Map your CSV column names to the internal keys here
     return {
         "questions": df['Questions'].tolist() if 'Questions' in df.columns else [],
@@ -19,10 +20,6 @@ def load_data(file_path):
         "claims": df['Claims'].tolist() if 'Claims' in df.columns else []
     }
     
-    # Validation: Ensure core columns exist
-    if not data_bundle["actual"]:
-        raise ValueError("The CSV must at least contain an 'Actual Answers' column.")
-
 
 def run_evaluation(input="sample_test.csv", output_path="evaluation_result.csv"):
     """
@@ -74,11 +71,11 @@ def run_evaluation(input="sample_test.csv", output_path="evaluation_result.csv")
             "entailment_result": res_entailment.get("entailment_result", "ERROR"),
             "entailment_met": res_entailment.get("count_claims_met", "0 of 0"),
             
-            # Dimension 4: Scope Coverage 
+            # Dimension 4: Scope Coverage (Under-generation)
             "coverage_result": res_coverage["coverage_result"],
    
-            # Dimension 5: Hallucination
-            "hallucination_result": res_grounding["hallucination_result"]
+            # Dimension 5: Unsupported Additions (Over-generation)
+            "unsupported_additions_result": res_grounding["unsupported_additions_result"]
         }
         results.append(row_output)
         
