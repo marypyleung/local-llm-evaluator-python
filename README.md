@@ -1,5 +1,5 @@
 # Local LLM Evaluator in Python 🔍
-This is a transparent, cost-aware evaluation harness for RAG-generated responses. By leveraging local Hugging Face models, this evaluator ensures data privacy and allows for thousands of evaluations with zero API costs.
+This is a transparent, cost-aware evaluation harness for RAG-generated responses or Fine-tuned LLM responses. It focuses on the Ground Truth Alignment (end-to-end evaluation). By leveraging local Hugging Face models, this evaluator ensures data privacy and allows for thousands of evaluations with zero API costs.
 
 ## 🚀 TL;DR 
 A cost-effective alternative to "LLM-as-a-judge." Use local NLP models to evaluate relevance, semantic equivalence, and logical entailment via a CSV-in → CSV-out workflow. Designed for large-scale regression testing where explainability and cost matter.
@@ -21,7 +21,7 @@ A cost-effective alternative to "LLM-as-a-judge." Use local NLP models to evalua
 - **Difficulty explaining** why a result failed
 
 To cope with the dilemma, this project is attempting to download free library resources and apply them for evaluating LLM output performance with reference and alignment with industry standard to provide the interested parties an other choice for affordable comparison automation.
-</details>
+</details> Regardless of the backend (RAG or Fine-tuning), if your goal is high-fidelity output alignment with a golden dataset, this tool provides the deterministic metrics you need.
 
 **This project offers:**
 - **Zero Cost:** Runs locally on CPU/GPU—no OpenAI/Anthropic bills.
