@@ -43,13 +43,13 @@ Designed for regression testing using industry-aligned evaluation concepts to pr
 
 ## 🎯 When This Tools Fits (and When It Doesn't)
 ✅ Great fit
-- You have a golden dataset (Expected answers)
-- You want repeatable E2E regression testing
-- You want evaluation to run locally (privacy/ cost constraint)
-- You care more about content alignment than writing style 
+- You have a **golden dataset** (Expected answers)
+- You want **repeatable E2E regression testing**
+- You want **local execution for LLM evaluation** (privacy/ cost constraint)
+- You care more about **content correctness**, not writing style 
 
-## 🚫 Not the goal (out of scope by design)
-Our goal is to provide a correctness-first tool for regression testing, not to replace human qualitative review. We do not evaluate:
+## 🚫 Out of Scope (by Design)
+This project focus on correctness-first evaluation. It does not assess:
 - **Fluency/Style:** Better handled via system prompts or moderation guardrails.
 - **Creativity:** Subjective quality that local models cannot reliably score.
 - **Safety/Toxicity:** Requires specialized classifiers.
