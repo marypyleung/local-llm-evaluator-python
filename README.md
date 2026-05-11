@@ -7,7 +7,7 @@ This project evaluates whether the **actual response** aligns with an **expected
 ## 🚀 TL;DR 
 - **Goal**: End-to-end evaluation of **Actual VS Expected** responses (golden dataset alignmnet)
 - **Approach**: Deterministic metrics using **local NLP models**(no "LLM-as-a-judge" prompts)
-- **Workflow**: CSV-in -> CSV-out, scalable for thousands of rows
+- **Workflow**: CSV-in → CSV-out, scalable for thousands of rows
 - **Best for**: Regression testing & continuous improvement of chatbot answer quality
 - **Key dimensions**: Relevance, Semantic Equivalence, Entailment (Claims), Scope Coverage (Under-generation), Unsupported additions (Over-generation)
 
@@ -36,9 +36,9 @@ Evaluation of LLM oftern becomes either:
 - **Difficulty explaining** why a result failed
 
 #### ✅**This project provides a third option**
-- Local metrics that are cost-effective 
+- Local
 - Deterministic outcome with explainability 
-- Suitble for large-scale regression testing
+- Cost-efficient 
 Designed for regression testing using industry-aligned evaluation concepts to provide interested parties an other choice for affordable comparison automation.
 
 ## 🎯 When This Tools Fits (and When It Doesn't)
@@ -57,33 +57,33 @@ This project focus on correctness-first evaluation. It does not assess:
 ## 📊 Evaluation Mapping with Industry Standards
 Here is the summary table of what industry standard consider VS the inclusion and implemetation in our project.
 
-| Dimension | Industry Standard | Covered in This Project? | Implementation Logic |
+| Dimension | Commonly Used in Industry | Covered Here? | Implementation |
 | :--- | :--- | :--- | :--- |
 | **Relevance** | ✅ Yes | ✅ Yes | **Step 1:** Embedding Cosine Similarity (Question ↔ Actual) |
-| **Semantic Equivalence** | ✅ Yes | ✅ Yes | **Step 2:** Cross-Encoder (Expected ↔ Actual) |
-| **Logical Correctness** | ✅ Yes | ✅ Yes | **Step 3/5:** NLI Entailment & Hallucination |
-| **Entailment** | ✅ Yes | ✅ Yes | **Step 3:** Verification against user-provided atomic claims. |
-| **Scope Control** | ✅ Yes | ✅ Yes | **Step 4:** NLI check ensuring expected contents are covered in actual ones. |
-| **Unsupported Additions (Over-generation)** | ✅ Yes | ⚠️ Partial | **Step 5:** Flags "extra"/ "uncontrolled" info. |
+| **Semantic Equivalence** | ✅ Yes | ✅ Yes | **Step 2:** Cross-Encoder Similarity (Expected ↔ Actual) |
+| **Logical Correctness** | ✅ Yes | ✅ Yes | **Step 3/5:** NLI Entailment Checks |
+| **Entailment** | ✅ Yes | ✅ Yes | **Step 3:** Verification against Actual with Atomic Claims (Actual → Atomic Claims) |
+| **Scope Coverage (Under-generation)** | ✅ Yes | ✅ Yes | **Step 4:** NLI check ensuring expected contents are covered in actual ones (Expected → Actual)  |
+| **Unsupported Additions (Over-generation)** | ✅ Yes | ⚠️ Partial | **Step 5:** NLI check to flag "extra"/ "uncontrolled" info. (Actual → Expected) |
 | **Fluency / Style** | ✅ Yes | ❌ No | Intentionally excluded (focus is on content correctness). |
 | **Safety / Toxicity** | ✅ Yes | ❌ No | Requires specialized models (e.g., Llama Guard). |
-Note:  Unsupported addition is often colloquially called "hallucination" but in this repo it is measured relative to the Expected answer, not against external evidence.
+_Note:  Unsupported addition is often colloquially called "hallucination". In this project,it is measured **relative to the Expected answer**, not external evidence._
 
 ## 🛠️ Key Design Choices
-- No "LLM judge" prompts: avoids black-box prompt decisions
+- No "LLM-as-a-judge" prompts: avoids black-box prompt decisions
 - Deterministic pipeline logic: stable results for regression comparisons
-- Local models: no API calls, supports private datasets
-- CSV-first architecture" easy integration with Excel/ Power BI/ CI pipelines
-- Claims optional: you can run with or without manually authored atomic claims.
+- Fully local execution (no API calls)
+- CSV-first architecture (Excel/ Power BI/ CI-friendly)
+- Claims are optional - works with or without them
 
 
 ## 📂 Project Structure
-- **`evaluator.py`**: Core evaluation engine `DimensionOutcomeEvaluator` class
-- **`run_app.py`**: Orchestrator (CSV ingestion -> evaluation pipeline by -> CSV output) that manages the workflow. It uses the `load_data` function for CSV ingestion and the  function to execute the full AI pipeline.
+- **`evaluator.py`**: Core evaluation engine `DimensionOutcomeEvaluator`
+- **`run_app.py`**: Orchestrator (CSV ingestion → evaluation pipeline → CSV output) 
 - **`requirements.txt`**: `pip` dependencies
-- **`environment.yml`**: `Conda` environment configuration
-- **sample_test.csv**: sample input dataset
-- **evaluation_result.csv**:generated sample output (after running)
+- **`environment.yml`**: `Conda` environment
+- **sample_test.csv**: Sample input
+- **evaluation_result.csv**: Generated sample output
 
 ## 🔍 How It Works: Waterfall Evaluation Pipeline
 Each CSV row flows through a step-by-step evaluation pipeline:
@@ -95,30 +95,29 @@ graph LR
     B --> C(Step 2: Semantic Similarity)
     C --> D(Step 3: Entailment)
     D --> E(Step 4: Scope Coverage)
-    E --> F(Step 5: Hallucination)
+    E --> F(Step 5: Unsupported )
     F --> G[Output CSV]
 
     style A fill:#f9f,stroke:#333,stroke-width:2px
     style G fill:#bbf,stroke:#333,stroke-width:2px
 ```
 
-## 🧠 Evaluation Methodology & Models Applied
-The `DimensionOutcomeEvaluator` suite measures performance across five critical dimensions using local NLP models:
+## 🧠 Evaluation Methodology & Models
+The `DimensionOutcomeEvaluator` suite measures performance across five dimensions using local NLP models:
 
 | Steps | Evaluation Dimension | Explanation | Involved NLP/ Embedding Models |
 | :--- | :--- | :--- | :--- |
-| 1 |**Topic Relevance** (Question <-> Actual)| Ensures the LLM output directly addresses the user's question |[ all-mpnet-base-v2](https://huggingface.co/sentence-transformers/all-mpnet-base-v2) |
-| 2 |**Semantic Equivalence**  (Expected <-> Actual)|| CMeasure meaning-level alignment with the golden answer | [Cross-Encoder](https://huggingface.co/cross-encoder/stsb-roberta-large) 
-| 3 | **Entailment** (Actual -> Claims) _(optional but recommended)_ | Verify if the required atomic facts are supported by actual answers| [roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
-| 4 | **Scope Coverage/ Undergeneration**  (Actual -> Expected)| Check if the actual answers missed expected content (constraints) | [roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli)  |
-| 5 | **Unsupported Additions/ Overgeneration** (Expected -> Actual) | Flag content that goes beyond the expected answer |[roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
+| 1 |**Topic Relevance** (Question ↔ Actual)| Ensures the LLM output directly addresses the user's question |[ all-mpnet-base-v2](https://huggingface.co/sentence-transformers/all-mpnet-base-v2) |
+| 2 |**Semantic Equivalence**  (Expected ↔ Actual)| CMeasure meaning-level alignment with the golden answer | [Cross-Encoder](https://huggingface.co/cross-encoder/stsb-roberta-large) 
+| 3 | **Entailment** (Actual → Claims) _(optional but recommended)_ | Verify if the required atomic facts are supported by actual answers| [roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
+| 4 | **Scope Coverage/ Undergeneration**  (Actual → Expected)| Check if the actual answers missed expected content (constraints) | [roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli)  |
+| 5 | **Unsupported Additions/ Overgeneration** (Expected → Actual) | Flag content that goes beyond the expected answer |[roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
 
 You can change the models/ remove any parts of the steps based on your needs.
 
 ## ⏩ Quick Start
 
-### What input is needed?
-Based on the above methodology, a CSV input is required with the naming convention for the column names as below:
+### Required CSV columns
 - Questions
 - Expected Answers
 - Actual Answers
@@ -375,7 +374,7 @@ class DimensionOutcomeEvaluator:
     # -------------------------
     def coverage_indicator(self, expected, actual, conf_pass=0.70):
         """
-        Logic: Actual -> Expected. 
+        Logic: Actual → Expected. 
         Checks if the 'Actual' response contains the information from the 'Expected' answer.
         FAIL: The AI missed something important from the Golden Answer (Undergeneration).
         """
@@ -394,7 +393,7 @@ class DimensionOutcomeEvaluator:
     # -------------------------
     def grounding_indicator(self, expected, actual, conf_pass=0.70):
         """
-        Logic: Expected -> Actual.
+        Logic: Expected → Actual.
         Checks if the 'Actual' response is strictly supported by the 'Expected' answer.
         FAIL: The AI made something up that wasn't in the Golden Answer (unsupported additions).
         """
@@ -407,7 +406,7 @@ class DimensionOutcomeEvaluator:
         else:
             result = "BORDERLINE"
 
-        return {"hallucination_result": result}
+        return {"unsupported_additions_result": result}
 ```
 </details>
 
@@ -429,9 +428,6 @@ def load_data(file_path):
     df = pd.read_csv(file_path)
     df = df.fillna("")  # Critical: Prevents 'NoneType' errors in model encoding
 
-    # Validation: Ensure core columns exist
-    if not data_bundle["actual"]:
-        raise ValueError("The CSV must at least contain an 'Actual Answers' column.")
 
     # Map your CSV column names to the internal keys here
     return {
@@ -492,11 +488,11 @@ def run_evaluation(input="sample_test.csv", output_path="evaluation_result.csv")
             "entailment_result": res_entailment.get("entailment_result", "ERROR"),
             "entailment_met": res_entailment.get("count_claims_met", "0 of 0"),
             
-            # Dimension 4: Scope Coverage 
+            # Dimension 4: Scope Coverage (Under-generation)
             "coverage_result": res_coverage["coverage_result"],
    
-            # Dimension 5: Hallucination
-            "hallucination_result": res_grounding["hallucination_result"]
+            # Dimension 5: Unsupported Additions (Over-generation)
+            "unsupported_additions_result": res_grounding["unsupported_additions_result"]
         }
         results.append(row_output)
         
