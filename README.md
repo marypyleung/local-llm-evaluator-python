@@ -1,5 +1,7 @@
 # Local LLM Evaluator in Python 🔍
-This is a transparent, cost-aware evaluation harness for RAG-generated responses or Fine-tuned LLM responses. It focuses on the Ground Truth Alignment (end-to-end evaluation). By leveraging local Hugging Face models, this evaluator ensures data privacy and allows for thousands of evaluations with zero API costs.
+A transparent, cost-aware evaluation harness for LLM-generated responses—including RAG outputs and fine‑tuned model outputs. This project focuses on ground-truth alignment (end-to-end evaluation) using local Hugging Face models, enabling privacy-preserving evaluation at scale with zero API cost.
+
+It is designed for regression testing and large-batch benchmarking where explainability, repeatability, and cost matter more than subjective “judge” prompts.
 
 ## 🚀 TL;DR 
 A cost-effective alternative to "LLM-as-a-judge." Use local NLP models to evaluate relevance, semantic equivalence, and logical entailment via a CSV-in → CSV-out workflow. Designed for large-scale regression testing where explainability and cost matter.
@@ -20,8 +22,8 @@ A cost-effective alternative to "LLM-as-a-judge." Use local NLP models to evalua
 - A **black‑box decision process** (“the LLM decided monolithically**”)
 - **Difficulty explaining** why a result failed
 
-To cope with the dilemma, this project is attempting to download free library resources and apply them for evaluating LLM output performance with reference and alignment with industry standard to provide the interested parties an other choice for affordable comparison automation.
-</details> Regardless of the backend (RAG or Fine-tuning), if your goal is high-fidelity output alignment with a golden dataset, this tool provides the deterministic metrics you need.
+To cope with the dilemma, this project is attempting to apply free library resources for evaluating LLM output performance with reference and alignment with industry standard to provide the interested parties an other choice for affordable comparison automation.
+</details> 
 
 **This project offers:**
 - **Zero Cost:** Runs locally on CPU/GPU—no OpenAI/Anthropic bills.
@@ -44,8 +46,9 @@ Here is the summary table of what industry standard consider VS the inclusion an
 
 
 ## 🛠️ Key Design Choices
-- **The "No-Claims" Solution:** Uses bidirectional NLI (Actual ↔ Expected) to check logical implication even if you haven't defined manually written atomic claims.
-- **Over-generation Warnings:** Flags extra entities as `WARNING` instead of a hard failure. This keeps humans in the loop for final verification.
+- **Two modes of entailment checking**
+-   Claims-based (if you provide atomic claims) + Claims fallback using bidirectional NLI between Expected and Actual; or
+-   No claims fallback using bidirectional NLI between Expected and Actual
 - **CSV-First Architecture:** Built for data pipelines. One row in, one row out. Results are stored in CSV columns, ready for Excel or PowerBI.
 - **Local & Deterministic:** You define your own local models (e.g., `all-mpnet-base-v2`) to produce consistent scores.
 
@@ -61,8 +64,10 @@ Our goal is to provide a correctness-first tool for regression testing, not to r
 - **`run_app.py`**: The "Orchestrator" that manages the workflow. It uses the `load_data` function for CSV ingestion and the `run_evaluation` function to execute the full AI pipeline.
 - **`requirements.txt`**: Clean list of dependencies for `Pip`.
 - **`environment.yml`**: Full environment configuration for `Conda`.
+- **sample_test.csv**: Example input dataset
+- **evaluation_result.csv**: Example output (generated)
 
-## 🔍 How the Script Works: The Evaluation Pipeline
+## 🔍 How It Works: The Evaluation Pipeline
 The evaluator processes each row through a "Waterfall" architecture. Each step provides a different lens of truth:
 
 **Workflow:**
@@ -86,13 +91,22 @@ The `DimensionOutcomeEvaluator` suite measures performance across five critical 
 | :--- | :--- | :--- | :--- |
 | 1 |**Topic Relevance**| Ensures the LLM output directly addresses the user's question |[ all-mpnet-base-v2](https://huggingface.co/sentence-transformers/all-mpnet-base-v2) |
 | 2 |**Semantic Similarity** | Compares the Expected (Ground Truth) to the Actual Response for meaning-based alignment | [Cross-Encoder](https://huggingface.co/cross-encoder/stsb-roberta-large) |
-| 3 | **Entailment** | Verify if the response is logically supported by specific Atomic Claims | [roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
+| 3 | **Entailment** | Verify if the response is logically supported by specific Atomic Claims (If you don’t provide claims, Step 3 can be skipped, and Steps 4–5 still provide strong end-to-end signals.) | [roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
 | 4 | **Scope Coverage** | Ensures the response covers expected content (constraints) | [roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli)  |
-| 5 | **Hallucination** | Identifies over-generation/extra entities not present in the reference |[roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
+| 5 | **Overgeneration** | Identifies over-generation/extra entities not present in the reference |[roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
 
 You can change the models/ remove any parts of the steps based on your needs.
 
 ## ⏩ Quick Start
+
+### What is needed?
+
+Best suited for LLM outputs (RAG or fine-tuned) where you have:
+
+a question
+an expected (golden) answer
+an actual answer
+optionally, atomic claims and/or retrieved contexts
 
 ### 💻 Setup
 - 1: Clone this repo.
