@@ -1,43 +1,45 @@
 # Local LLM Evaluator in Python 🔍
-A transparent, cost-aware evaluation harness for end-to-end (E2E) output alignment of chatbot responses - especially LLM-generated responses from RAG systems or fine-tuned LLMs.
+A transparent, cost-aware evaluation harness for **end-to-end (E2E) output alignment **of chatbot responses - especially LLM-generated responses from RAG systems or fine-tuned LLMs.
 Hugging Face models, enabling privacy-preserving evaluation at scale with zero API cost.
 
-This project evaluates whether the actual response aligns with your **expected (golden) answer** using local Hugghig Face models (embeddings, cross-encoders, and NLI). It is designed for regression testing, batch benchmarking and privacy-sensitive environment with zero API cost.
+This project evaluates whether the **actual response** aligns with an **expected (golden) answer** using l**ocal Hugghig Face models** (embeddings, cross-encoders, and NLI). It is designed for regression testing, batch benchmarking and privacy-sensitive environment with zero API cost.
 
 ## 🚀 TL;DR 
-- Goal: End-to-end evaluation of Actual VS Expected responses (golden dataset alignmnet)
-- Approach: Deterministic metrics using local NLP models (no "LLM-as-a-judge" prompts)
-- Workflow: CSV-in -> CSV-out, scalable for thousands of rows
-- Best for: Regression testing & continuous improvement of chatbot answer quality
-- Key dimensions: Relevance, Semantic Equivalence, Entailment/ Claims. Coverage, Over-generation (unsupported additions)
+- **Goal**: End-to-end evaluation of **Actual VS Expected** responses (golden dataset alignmnet)
+- **Approach**: Deterministic metrics using **local NLP models**(no "LLM-as-a-judge" prompts)
+- **Workflow**: CSV-in -> CSV-out, scalable for thousands of rows
+- **Best for**: Regression testing & continuous improvement of chatbot answer quality
+- **Key dimensions**: Relevance, Semantic Equivalence, Entailment (Claims), Scope Coverage (Under-generation), Unsupported additions (Over-generation)
 
 ## 📖 What "End-to-End Evaluation" Means Here? 
-This evaluator measures quality from the user's question to the final answer output, without requiring access to your internal bakend logic. 
+This evaluator measures quality **from the user's question to the final answer output**, without requiring access to internal bakend logic. 
 
-For each test case (row), we compare:
+For each test case (row), the evaluation compares:
 - Question
 - Expected Answer (golden answer/ reference)
 - Actual Answer (chatbot output)
 
-Optional field can strengthen evaluation"
-- Claims )atomic facts that must be satisfied)
-- 
+Optional field:
+- Claims - atomic facts that must be satisfied (recommended for outcome-level correctness and alignment, not internal model behavior)
+
 ## ❓ Why This Project?
 Evaluation of LLM oftern becomes either:
 
-#### 1. Manual review
-- **Subjectivity:** “Correct / incorrect” is often a matter of opinion among reviewers.
-- **Vagueness:** Evaluation dimensions are often implicit rather than defined.
-- **Scalability:** Human review is labor-intensive and slow, making scaling difficult.
+#### 1️⃣ Manual review
+- **Subjectivity:** “Correct / incorrect” is often a matter of opinion among reviewers
+- **Vagueness:** Evaluation dimensions are often implicit rather than defined
+- **Scalability:** Human review is labor-intensive and slow
 
-#### 2. LLM-as-a-judge
+#### 2️⃣ LLM-as-a-judge
 - **Cost concerns**: expensive at scale for paid LLM APIs
-- A **black‑box decision process** (“the LLM decided monolithically”)
+- **Black‑box decision process** (“the prompts decided monolithically”)
 - **Difficulty explaining** why a result failed
 
-**This project provides a third option:**
-✅ Local, deterministic metrics that are explainable and cost-effective - suitble for large-scale regression testing.
-free library resources for evaluating LLM output performance with reference and alignment with industry standard to provide the interested parties an other choice for affordable comparison automation.
+#### ✅**This project provides a third option**
+- Local metrics that are cost-effective 
+- Deterministic outcome with explainability 
+- Suitble for large-scale regression testing
+Designed for regression testing using industry-aligned evaluation concepts to provide interested parties an other choice for affordable comparison automation.
 
 ## 🎯 When This Tools Fits (and When It Doesn't)
 ✅ Great fit
