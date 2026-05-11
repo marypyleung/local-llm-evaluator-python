@@ -6,7 +6,7 @@ This project evaluates whether the **actual response** aligns with an **expected
 
 ## 🚀 TL;DR 
 - **Goal**: End-to-end evaluation of **Actual VS Expected** responses (golden dataset alignmnet)
-- **Approach**: Deterministic metrics using **local NLP models**(no "LLM-as-a-judge" prompts)
+- **Approach**: Deterministic metrics using **local NLP models** (no "LLM-as-a-judge" prompts)
 - **Workflow**: CSV-in → CSV-out, scalable for thousands of rows
 - **Best for**: Regression testing & continuous improvement of chatbot answer quality
 - **Key dimensions**: Relevance, Semantic Equivalence, Entailment (Claims), Scope Coverage (Under-generation), Unsupported additions (Over-generation)
@@ -111,8 +111,8 @@ The `DimensionOutcomeEvaluator` suite measures performance across five dimension
 | 1 |**Topic Relevance** (Question ↔ Actual)| Ensures the LLM output directly addresses the user's question |[ all-mpnet-base-v2](https://huggingface.co/sentence-transformers/all-mpnet-base-v2) |
 | 2 |**Semantic Equivalence**  (Expected ↔ Actual)| CMeasure meaning-level alignment with the golden answer | [Cross-Encoder](https://huggingface.co/cross-encoder/stsb-roberta-large) 
 | 3 | **Entailment** (Actual → Claims) _(optional but recommended)_ | Verify if the required atomic facts are supported by actual answers| [roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
-| 4 | **Scope Coverage/ Undergeneration**  (Actual → Expected)| Check if the actual answers missed expected content (constraints) | [roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli)  |
-| 5 | **Unsupported Additions/ Overgeneration** (Expected → Actual) | Flag content that goes beyond the expected answer |[roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
+| 4 | **Scope Coverage/ Under-generation**  (Actual → Expected)| Check if the actual answers missed expected content (constraints) | [roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli)  |
+| 5 | **Unsupported Additions/ Over-generation** (Expected → Actual) | Flag content that goes beyond the expected answer |[roberta-large-mnli](https://huggingface.co/FacebookAI/roberta-large-mnli) |
 
 You can change the models/ remove any parts of the steps based on your needs.
 
@@ -163,7 +163,7 @@ class DimensionOutcomeEvaluator:
     """
     A comprehensive evaluation suite for LLM responses using local models.
     Measures performance across five dimensions: Relevance, Similarity, 
-    Entailment (NLI), Scope Coverage (undergeneration), and Unsupported Additions (overgeneration).
+    Entailment (NLI), Scope Coverage (under-generation), and Unsupported Additions (over-generation).
     """
 
 
@@ -367,13 +367,13 @@ class DimensionOutcomeEvaluator:
         }
     
     # -------------------------
-    # 4) Scope Coverage Indicator (Undergeneration)
+    # 4) Scope Coverage Indicator (Under-generation)
     # -------------------------
     def coverage_indicator(self, expected, actual, conf_pass=0.70):
         """
         Logic: Actual → Expected. 
         Checks if the 'Actual' response contains the information from the 'Expected' answer.
-        FAIL: The AI missed something important from the Golden Answer (Undergeneration).
+        FAIL: The AI missed something important from the Golden Answer (Under-generation).
         """
         check = self._nli(str(actual or ""), str(expected or ""))
         if check["label"] == "ENTAILMENT" and check["confidence"] >= conf_pass:
@@ -386,7 +386,7 @@ class DimensionOutcomeEvaluator:
         return {"coverage_result": result}
 
     # -------------------------
-    # 5) Unsupported Additions (Overgeneration)
+    # 5) Unsupported Additions (Over-generation)
     # -------------------------
     def grounding_indicator(self, expected, actual, conf_pass=0.70):
         """
