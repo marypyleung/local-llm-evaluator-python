@@ -67,6 +67,7 @@ Here is the summary table of what industry standard consider VS the inclusion an
 | **Unsupported Additions (Over-generation)** | ✅ Yes | ⚠️ Partial | **Step 5:** NLI check to flag "extra"/ "uncontrolled" info. (Actual → Expected) |
 | **Fluency / Style** | ✅ Yes | ❌ No | Intentionally excluded (focus is on content correctness). |
 | **Safety / Toxicity** | ✅ Yes | ❌ No | Requires specialized models (e.g., Llama Guard). |
+
 _Note:  Unsupported addition is often colloquially called "hallucination". In this project,it is measured **relative to the Expected answer**, not external evidence._
 
 ## 🛠️ Key Design Choices
