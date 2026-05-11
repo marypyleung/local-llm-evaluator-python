@@ -156,6 +156,7 @@ Optional:
 from sentence_transformers import SentenceTransformer, CrossEncoder, util
 from transformers import pipeline
 import json
+import re
 
 class DimensionOutcomeEvaluator:
     """
@@ -200,8 +201,8 @@ class DimensionOutcomeEvaluator:
             This internal utility determines the logical relationship between two 
             text segments. It serves as the foundation for:
             - Step 3: Entailment (Fact-checking)
-            - Step 4: Scope Coverage (Undergeneration)
-            - Step 5: Hallunication (Grounding)
+            - Step 4: Scope Coverage (Under-generation)
+            - Step 5: Unsupported Addiction (Ove-rgeneration)
             
              Logic Flow inherited from label field of roberta-large-mnli model:
             - ENTAILMENT: The premise supports the hypothesis.
@@ -218,15 +219,16 @@ class DimensionOutcomeEvaluator:
         """
         out_raw = self.nli(premise, text_pair=hypothesis)
 
-        # Robust Parsing: HuggingFace pipelines return nested lists [[...]] when 
-        # top_k=None is set. Unwrap this to access the dictionary.
+        # Robust Parsing: HuggingFace pipelines may return different list formats, 
+        # top_k valu differs. Unwrap this to access the dictionary.
         if isinstance(out_raw, list):
             data = [out_raw]
-        elif isinstance(out_raw, list) and out_raw and  isinstance(out_raw[0], list):
+        elif isinstance(out_raw, list) and out_raw and isinstance(out_raw[0], list):
             data = out_raw[0]
+        elif isinstance(out_raw, list):
+            data = out_raw
         else:
-            data = out_raw if isinstance(out_raw, list) else []
-  
+            data = []
 
         # Now can safely iterate over dictionaries
         try:
@@ -326,7 +328,7 @@ class DimensionOutcomeEvaluator:
         if isinstance(claims, str):
             try:
                 # json.loads is stricter and safer than ast.literal_eval
-                claims = json.loads(claims.replace("'", '"')) 
+                claims = json.loads(claims) 
             except (json.JSONDecodeError, ValueError):
                 # If it's not valid JSON, skip it to ensure data integrity
                 return {
